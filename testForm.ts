@@ -2,13 +2,12 @@ import { initAction } from '../../util/action';
 import { initApi, ApiConfig } from '../../util/api';
 import { handleActions } from 'redux-actions';
 
-let modelName = 'testForm';
+let modelName = 'testForm2';
 
 // simple actions
 
 export let keys = {
   changeName: 'changeName',
-  setValues: 'setValues'
 };
 
 const simpleActions = initAction<typeof keys>(keys, modelName);
@@ -19,19 +18,15 @@ export const actions = simpleActions.actions;
 // apis
 
 export let apis = {
-  login: 'login',
-  getRoleList: 'getRoleList'
+  getName: 'getName',
 };
 
 let apiConfigs: ApiConfig[] = [{
-  path: '/system/login',
-  actionName: apis.login,
-},{
-  path: '/role/getRoleList',
-  actionName: apis.getRoleList,
+  path: '/system/getName',
+  actionName: apis.getName,
 }];
 
-const api = initApi<typeof apis>('/business', apiConfigs, modelName);
+const api = initApi<typeof apis>('', apiConfigs, modelName);
 
 export const apiActionNames = api.apiActionNames;
 export const apiActions = api.apiActions;
@@ -39,59 +34,39 @@ export const sagas = api.sagas;
 
 // reducers
 
-export interface TestFormState {
-    loading: boolean;
-    groupName: string;
-    groupOldName: string;
-    groupNewName: string;
-    operatorId: number;
-    name: string;
-    age: number;
+export interface TestForm2State {
+  loading: boolean;
+  name: string;
 };
 
-export const reducer = handleActions<TestFormState, any>({
-  [apiActionNames.login.request](state, action) {
+export const reducer = handleActions<TestForm2State, any>({
+  [apiActionNames.getName.request](state, action) {
     return {
       ...state,
       loading: true,
     };
   },
-  [apiActionNames.login.success](state, action) {
-    console.log('action.payload',action.payload);
+  [apiActionNames.getName.success](state, action) {
     return {
       ...state,
       loading: false,
-      operatorId: action.payload.res.operatorId,
+      name: action.payload.res.name,
     };
   },
-  [apiActionNames.login.error](state, action) {
+  [apiActionNames.getName.error](state, action) {
     return {
       ...state,
       loading: false,
       name: '',
     };
   },
-  [apiActionNames.getRoleList.success](state, action) {
-    console.log('action.payload',action.payload);    
+  [actionNames.changeName](state, action) {
     return {
       ...state,
-      name: `${action.payload.res.pageMax}`,
-      age: action.payload.res.totalNum,
-    };
-  },
-  [actionNames.setValues](state, action) {
-    return {
-      ...state,
-      ...action.payload,
-      // phone: action.payload.phone
+      name: action.payload.name,
     };
   },
 }, {
   loading: false,
-  operatorId: 0,
-  groupName: undefined,
-  groupOldName: undefined,
-  groupNewName: undefined,
-  name: undefined,
-  age: undefined
+  name: '',
 });
