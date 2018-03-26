@@ -3,68 +3,64 @@ import { Form, Button, Input, Row, Col } from 'antd';
 const FormItem = Form.Item;
 import CardEx from '../../common/CardEx';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import { TestFormState, apiActions, apis, actions, keys } from '../../../models/system/testForm';
+import { TestForm2State, apiActions, apis, actions, keys } from '../../../models/system/testForm2';
 import { connect } from 'react-redux';
 import { FORMITEMLAYOUT, FORMITEMLAYOUT_WIDTHOUTLABEL } from '../../../util/constants';
 import { Field } from '../../../util/baseDecorator';
 import Back from '../../common/Back';
 
-export interface TestFormOwnProps {
+export interface TestForm2OwnProps {
   options: {
     groupId: number;
+    groupName: string;
   };
 }
 
-export interface TestFormProps extends TestFormOwnProps {
+export interface TestForm2Props extends TestForm2OwnProps {
   form?: WrappedFormUtils;
   token: any;
-  data: TestFormState;
+  data: TestForm2State;
   dispatch: any;
 }
 
 const formFields = {
   groupName: new Field('groupName', '分组名称'),
-  groupOldName: new Field('groupOldName', '分组旧名称'),
-  groupNewName: new Field('groupNewName', '分组新名称'),
 };
 
-class TestForm extends React.Component<TestFormProps, any> {
+class TestForm2 extends React.Component<TestForm2Props, any> {
   static defaultProps = {
     options: {
-      groupId: null
+      groupId: null,
+      groupName: undefined,
     },
   };
 
   componentWillMount() {
     const { dispatch, options } = this.props;
-    dispatch(apiActions[apis.getRoleList]({
+    dispatch(actions[keys.setTestForm2]({
       ...options,
     }));
   }
 
   handleSubmit = () => {
-    const { form, dispatch, token, options, data } = this.props;
+    const { form, dispatch, token, options } = this.props;
     form.validateFields((errors, values) => {
       if (!!errors) {
         return;
       }
-      // console.log('values',values);
-      // console.log('token',token)
       let payload = {
         ...token,
         ...values,
       };
-      // console.log('payload',payload)
-      dispatch(apiActions[apis.login](payload))
-      // if (options.groupId) {
-      //   payload = {
-      //     ...payload,
-      //     groupId: options.groupId,
-      //   };
-      //   dispatch(apiActions[apis.editGroup](payload));
-      // }else {
-      //   dispatch(apiActions[apis.addGroup](payload));
-      // }
+      if (options.groupId) {
+        payload = {
+          ...payload,
+          groupId: options.groupId,
+        };
+        dispatch(apiActions[apis.editGroup](payload));
+      }else {
+        dispatch(apiActions[apis.addGroup](payload));
+      }
     });
   }
 
@@ -80,43 +76,19 @@ class TestForm extends React.Component<TestFormProps, any> {
     return (
       <CardEx>
         <Back
-          componentName="RoleList"
+          componentName="getGroupList"
         />
-        <div>{this.props.data.operatorId}</div>
         <Row>
           <Col span={14} offset={6}>
             <Form layout="horizontal">
               <FormItem
-                label={'分组名称'}
+                label={formFields.groupName.text}
                 {...FORMITEMLAYOUT}
               >
-                {getFieldDecorator('groupName', {
+                {getFieldDecorator(formFields.groupName.name, {
                   rules: [{
-                    message: '请输入',
-                  }],
-                })(
-                  <Input style={inputStyle} />
-                )}
-              </FormItem>
-              <FormItem
-                label={'分组旧名称'}
-                {...FORMITEMLAYOUT}
-              >
-                {getFieldDecorator('groupOldName', {
-                  rules: [{
-                    message: '请输入',
-                  }],
-                })(
-                  <Input style={inputStyle} />
-                )}
-              </FormItem>
-              <FormItem
-                label={'分组名称'}
-                {...FORMITEMLAYOUT}
-              >
-                {getFieldDecorator('groupNewName', {
-                  rules: [{
-                    message: '请输入',
+                    required: true,
+                    message: formFields.groupName.message(),
                   }],
                 })(
                   <Input style={inputStyle} />
@@ -141,29 +113,25 @@ class TestForm extends React.Component<TestFormProps, any> {
 }
 
 const mapState2Props = state => {
-  const { token, testForm } = state;
-  console.log('state',state);
+  const { token, testForm2 } = state;
   return {
     token,
-    data: testForm,
+    data: testForm2,
   };
 };
 
-const mapPropsToFields = (props: TestFormProps) => {
+const mapPropsToFields = (props: TestForm2Props) => {
   let data = props.data;
   return {
     [formFields.groupName.name]: {value: data.groupName},
-    [formFields.groupOldName.name]: {value: data.groupOldName},
-    [formFields.groupNewName.name]: {value: data.groupNewName},
   };
 };
 
-const onValuesChange = (props: TestFormProps, values) => {
+const onValuesChange = (props: TestForm2Props, values) => {
   const { dispatch } = props;
   dispatch(actions[keys.setValues](values));
 };
 
-export default connect<any, any,  TestFormOwnProps>(mapState2Props)(
-  Form.create({mapPropsToFields, onValuesChange})(TestForm)
+export default connect<any, any,  TestForm2OwnProps>(mapState2Props)(
+  Form.create({mapPropsToFields, onValuesChange})( TestForm2)
 );
-
