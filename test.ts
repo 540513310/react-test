@@ -1,9 +1,8 @@
 import { initAction } from '../../util/action';
 import { initApi, ApiConfig } from '../../util/api';
 import { handleActions } from 'redux-actions';
-import { makeListHandleActions, ListState } from '../../util/listReducers';
 
-let modelName = 'test';
+let modelName = 'testing2';
 
 // simple actions
 
@@ -35,14 +34,12 @@ export const sagas = api.sagas;
 
 // reducers
 
-export interface TestState extends ListState<any> {
+export interface Testing2State {
   loading: boolean;
   name: string;
 };
-const listHandle = makeListHandleActions(apiActionNames.getName);
 
-export const reducer = handleActions<TestState, any>({
-  ...listHandle.handleActions,
+export const reducer = handleActions<Testing2State, any>({
   [apiActionNames.getName.request](state, action) {
     return {
       ...state,
@@ -70,7 +67,6 @@ export const reducer = handleActions<TestState, any>({
     };
   },
 }, {
-  ...listHandle.initializeState,  
   loading: false,
   name: '',
 });
