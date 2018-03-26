@@ -1,14 +1,14 @@
 import * as React from 'react';
 import UniTable, { TableColumnConfig, ToolbarButtonDecorator } from '../../common/UniTable';
-import { TestState, apiActions, apis } from '../../../models/system/test';
+import { testing2State, apiActions, apis } from '../../../models/system/testing2';
 import { updatePane } from '../../../models/common/sidebar';
 import { injectApi, ApiComponentProps } from '../../util';
 
-export interface TestProps extends ApiComponentProps<TestState> {
+export interface testing2Props extends ApiComponentProps<testing2State> {
 
 }
 
-class Test extends React.Component<TestProps, any> {
+class testing2 extends React.Component<testing2Props, any> {
   render() {
     const { data, dispatch } = this.props;
 
@@ -61,7 +61,7 @@ class Test extends React.Component<TestProps, any> {
     return (
       <UniTable
         columns={columns}
-        apiAction={apiActions.getName}
+        apiAction={apiActions.testing2}
         tableState={data as any}
         toolbarButtons={toolbarButtons}
         hasToolbar={true}
@@ -70,6 +70,6 @@ class Test extends React.Component<TestProps, any> {
   }
 }
 
-export default injectApi(Test, {
-  data: 'test',
+export default injectApi(testing2, {
+  data: 'testing2',
 });
